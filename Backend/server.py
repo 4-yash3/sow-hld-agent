@@ -25,12 +25,19 @@ load_dotenv()
 
 app = FastAPI(title="SOW-to-HLD Agent API")
 
+origins = [
+    "http://localhost:3000",
+    "https://sow-hld-agent.vercel.app",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 UPLOAD_DIR = os.path.abspath("./tmp/uploads")
