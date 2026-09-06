@@ -23,5 +23,6 @@ python-docx>=1.1.0
 # API Server & Execution Entry Point
 fastapi>=0.110.0
 uvicorn>=0.29.0
+python-multipart>=0.0.9
 
 diagrams 
