@@ -1,9 +1,22 @@
 import os
+import time
 from typing import Dict, Any, Optional
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from docx import Document
 from docx.shared import Inches as DocxInches, Pt as DocxPt
+
+def _safe_save(file_obj, output_path: str) -> str:
+    """Attempts to save the document; if locked by Word/PPT or preview pane, appends a timestamp."""
+    try:
+        file_obj.save(output_path)
+        return output_path
+    except PermissionError:
+        base, ext = os.path.splitext(output_path)
+        timestamped_path = f"{base}_{int(time.time())}{ext}"
+        file_obj.save(timestamped_path)
+        print(f"    ⚠️ Warning: '{os.path.basename(output_path)}' was locked by another process. Saved to '{os.path.basename(timestamped_path)}' instead.")
+        return timestamped_path
 
 class DocumentCompilerTool:
     """Tool that converts HLD Architecture JSON, Implementation Guidance, and rendered diagram images into PowerPoint (.pptx) or Word (.docx) documents."""
@@ -129,8 +142,8 @@ class DocumentCompilerTool:
                 )
 
         output_pptx_path = os.path.join(self.output_dir, filename)
-        prs.save(output_pptx_path)
-        return output_pptx_path
+        # Safe save for PPTX
+        return _safe_save(prs, output_pptx_path)
 
     # =====================================================================
     # Word (.docx) Compiler
@@ -154,7 +167,7 @@ class DocumentCompilerTool:
         doc.add_paragraph(hld_data.get("summary", ""))
         doc.add_paragraph(f"Architectural Pattern: {hld_data.get('architectural_pattern', 'N/A')}")
 
-        # 2. Components Table
+        # 2. Component Specification
         doc.add_heading("2. Component Specification", level=1)
         components = hld_data.get("components", [])
         if components:
@@ -215,7 +228,7 @@ class DocumentCompilerTool:
                 for note in roadmap:
                     doc.add_paragraph(str(note), style='List Bullet')
 
-        # 4. All 7 Diagram Sections
+        # 4. All Diagram Sections
         doc_diagram_configs = [
             ("architecture_diagram_path", "4. Component Architecture View"),
             ("usecase_diagram_path", "5. Functional Scope & Use Case Diagram"),
@@ -248,68 +261,5 @@ class DocumentCompilerTool:
                 doc.add_paragraph(f"Security Controls: {', '.join(sec_controls)}")
 
         output_docx_path = os.path.join(self.output_dir, filename)
-        doc.save(output_docx_path)
-        return output_docx_path
-
-# =====================================================================
-# Standalone Execution / Test Routine
-# =====================================================================
-if __name__ == "__main__":
-    compiler = DocumentCompilerTool()
-    
-    mock_hld_dict = {
-        "system_name": "E-Commerce Vector Search API",
-        "architectural_pattern": "Event-Driven Microservices",
-        "summary": "High-throughput semantic vector search infrastructure running on AWS ECS and OpenSearch.",
-        "components": [
-            {
-                "name": "API Gateway",
-                "tech_stack": "AWS CloudFront + ALB",
-                "description": "Routes external REST traffic and validates authorization JWTs."
-            }
-        ],
-        "infrastructure": {
-            "cloud_provider": "AWS",
-            "scaling_strategy": "Auto-scaling ECS Fargate task instances."
-        }
-    }
-    
-    mock_guidance_dict = {
-        "system_title": "Implementation Guidance - Vector Search",
-        "architecture_summary": "Implementation tech stack tagging with open-source options for self-hosting.",
-        "tech_stack_matrix": [
-            {
-                "component_name": "Vector Database",
-                "component_role": "Embeddings storage and sub-50ms approximate nearest neighbor search",
-                "primary_best_tech": "Pinecone (Serverless)",
-                "tech_category": "Managed SaaS",
-                "is_proprietary_or_paid": True,
-                "selection_rationale": "Zero-ops scaling with optimized dense-sparse hybrid indexing.",
-                "open_source_alternative": "Qdrant / Milvus",
-                "alternative_rationale": "Can be self-hosted on Kubernetes clusters with minimal memory overhead.",
-                "recommended_libraries_frameworks": ["qdrant-client", "fastembed", "langchain-community"]
-            }
-        ],
-        "implementation_roadmap_notes": [
-            "Set up Qdrant Docker container or Pinecone API keys first.",
-            "Implement ingestion pipeline worker prior to exposing search API."
-        ]
-    }
-    
-    print("Testing DocumentCompilerTool locally...")
-    try:
-        pptx_path = compiler.create_pptx_deck(
-            mock_hld_dict, 
-            implementation_guidance=mock_guidance_dict, 
-            filename="Test_HLD.pptx"
-        )
-        docx_path = compiler.create_docx_report(
-            mock_hld_dict, 
-            implementation_guidance=mock_guidance_dict, 
-            filename="Test_HLD.docx"
-        )
-        print("\n--- Deliverables Successfully Compiled! ---")
-        print(f"PowerPoint Deck: {os.path.abspath(pptx_path)}")
-        print(f"Word Specification: {os.path.abspath(docx_path)}")
-    except Exception as err:
-        print(f"Compilation error: {err}")
+        # Safe save for DOCX
+        return _safe_save(doc, output_docx_path)

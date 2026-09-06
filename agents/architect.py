@@ -45,25 +45,30 @@ class HLDArchitectureSchema(BaseModel):
     data_flows: List[DataFlowSpec] = Field(default_factory=list, description="Step-by-step data flow sequence")
     infrastructure: InfrastructureSpec = Field(description="Cloud infrastructure and security specs")
     
-    # -----------------------------------------------------------------
-    # 7 Detailed Mermaid Diagram Fields
-    # -----------------------------------------------------------------
-    mermaid_architecture_code: str = Field(
+
+    # All 7 Mermaid Diagram Fields 
+    mermaid_architecture_code: Optional[str] = Field(
+        default="",
         description="Detailed Mermaid.js 'graph TD' showing API gateways, microservices, databases, caches, queues, and protocols"
     )
-    mermaid_usecase_code: str = Field(
+    mermaid_usecase_code: Optional[str] = Field(
+        default="",
         description="Detailed Mermaid.js 'graph LR' mapping distinct actors/user roles to subgraphs of functional use cases"
     )
-    mermaid_dfd_code: str = Field(
+    mermaid_dfd_code: Optional[str] = Field(
+        default="",
         description="Detailed Mermaid.js 'graph LR' data flow diagram showing data ingestion pipelines, workers, streams, and storage"
     )
-    mermaid_er_code: str = Field(
+    mermaid_er_code: Optional[str] = Field(
+        default="",
         description="Detailed Mermaid.js 'erDiagram' showing primary entities, attributes, data types, primary/foreign keys (PK/FK), and cardinality"
     )
-    mermaid_deployment_code: str = Field(
+    mermaid_deployment_code: Optional[str] = Field(
+        default="",
         description="Detailed Mermaid.js 'graph TB' showing cloud infrastructure topography (VPC, Public/Private Subnets, Load Balancers, Multi-AZ DBs)"
     )
-    mermaid_sequence_code: str = Field(
+    mermaid_sequence_code: Optional[str] = Field(
+        default="",
         description="Detailed Mermaid.js 'sequenceDiagram' rendering step-by-step interaction flows with auth headers and API endpoints"
     )
     mermaid_state_code: Optional[str] = Field(
