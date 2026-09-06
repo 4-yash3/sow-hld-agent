@@ -1,3 +1,4 @@
+// sow-hld-ui/lib/useCopilot.ts
 import { useState, useRef, useEffect } from "react";
 
 export interface Message {
@@ -13,7 +14,8 @@ export function useCopilot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Upload your SOW PDF, then tell me what to build (e.g. 'Synthesize HLD', 'Create sequence diagram', 'Generate ER diagram').",
+      content:
+        "Upload your SOW PDF, then tell me what to build (e.g. 'Synthesize HLD', 'Create sequence diagram', 'Generate ER diagram').",
     },
   ]);
   const [inputPrompt, setInputPrompt] = useState("");
@@ -37,7 +39,6 @@ export function useCopilot() {
     formData.append("session_id", "default");
 
     try {
-      // Direct string concatenation prevents quotation escaping errors
       const res = await fetch(`${BACKEND_URL}/api/upload-sow`, {
         method: "POST",
         body: formData,
@@ -47,7 +48,7 @@ export function useCopilot() {
         throw new Error(`Upload failed with status: ${res.status}`);
       }
 
-      const data = await res.json();
+      await res.json();
       setMessages((prev) => [
         ...prev,
         {
@@ -56,7 +57,7 @@ export function useCopilot() {
         },
       ]);
     } catch (err) {
-      console.error(err);
+      console.error("PDF upload error:", err);
       setMessages((prev) => [
         ...prev,
         {
@@ -80,7 +81,9 @@ export function useCopilot() {
     try {
       const res = await fetch(`${BACKEND_URL}/api/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ message: text, session_id: "default" }),
       });
 
@@ -103,7 +106,7 @@ export function useCopilot() {
         setSelectedDiagramKey(keys[keys.length - 1]);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Agent chat error:", err);
       setMessages((prev) => [
         ...prev,
         {
