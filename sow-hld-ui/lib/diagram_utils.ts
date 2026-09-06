@@ -1,6 +1,6 @@
 // lib/diagram_utils.ts
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://sow-hld-agent.onrender.com";
 
 export function getDiagramSrc(manifest: Record<string, Record<string, unknown>>, key: string): string | null {
   const item = manifest[key];
