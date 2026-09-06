@@ -11,6 +11,7 @@ import { useCopilot } from "@/lib/useCopilot";
 
 const tabs = ["System Context HLD", "Sequence Diagram", "Data Entity Model"];
 const Github = Code2;
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://sow-hld-agent.onrender.com";
 
 function Node({ title, detail, icon: Icon = Box, accent = "", badge, online = false }: { title: string; detail: string; icon?: React.ElementType; accent?: string; badge?: string; online?: boolean }) {
   return (
@@ -82,7 +83,7 @@ export default function Dashboard() {
   const sourcePath = typeof diagram?.image_path === "string" ? diagram.image_path : typeof diagram?.path === "string" ? diagram.path : "";
   const diagramSrc: string | null = previewUrl || (() => { 
     const filename = sourcePath.split(/[/\\]/).pop(); 
-    return filename ? `https://sow-hld-agent.onrender.com/api/diagram-image/${filename}` : null; 
+    return filename ? `${BACKEND_URL}/api/diagram-image/${filename}` : null; 
   })();
 
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 15, 250));
@@ -148,10 +149,10 @@ export default function Dashboard() {
         </div>
         
         <div className="header-actions">
-          <a href="https://sow-hld-agent.onrender.com/api/download/docx" className="header-button">
+          <a href={`${BACKEND_URL}/api/download/docx`} className="header-button">
             <Download size={15} /> DOCX
           </a>
-          <a href="https://sow-hld-agent.onrender.com/api/download/pptx" className="header-button header-button-warm">
+          <a href={`${BACKEND_URL}/api/download/pptx`} className="header-button header-button-warm">
             <Download size={15} /> PPTX Deck
           </a>
           <button className="icon-button" aria-label="Settings">
@@ -263,14 +264,12 @@ export default function Dashboard() {
             </nav>
 
             <div className="canvas-actions">
-              {/* Working Zoom Controls Group */}
               <div className="zoom-controls">
                 <button className="zoom-btn" onClick={handleZoomOut} title="Zoom Out">−</button>
                 <span className="zoom-text" onClick={handleZoomReset} title="Click to reset zoom">{zoom}%</span>
                 <button className="zoom-btn" onClick={handleZoomIn} title="Zoom In">+</button>
               </div>
 
-              {/* Download Diagram Button */}
               <button 
                 className="icon-button" 
                 onClick={handleDownloadImage} 
@@ -294,7 +293,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Canvas Viewport with Adaptive Zoom Origin & Drag Pan */}
           <div 
             className="canvas-content" 
             ref={canvasRef}
