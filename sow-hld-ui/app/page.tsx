@@ -82,7 +82,7 @@ export default function Dashboard() {
   const sourcePath = typeof diagram?.image_path === "string" ? diagram.image_path : typeof diagram?.path === "string" ? diagram.path : "";
   const diagramSrc: string | null = previewUrl || (() => { 
     const filename = sourcePath.split(/[/\\]/).pop(); 
-    return filename ? `http://localhost:8000/api/diagram-image/${filename}` : null; 
+    return filename ? `https://sow-hld-agent.onrender.com/api/diagram-image/${filename}` : null; 
   })();
 
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 15, 250));
@@ -148,10 +148,10 @@ export default function Dashboard() {
         </div>
         
         <div className="header-actions">
-          <a href="http://localhost:8000/api/download/docx" className="header-button">
+          <a href="https://sow-hld-agent.onrender.com/api/download/docx" className="header-button">
             <Download size={15} /> DOCX
           </a>
-          <a href="http://localhost:8000/api/download/pptx" className="header-button header-button-warm">
+          <a href="https://sow-hld-agent.onrender.com/api/download/pptx" className="header-button header-button-warm">
             <Download size={15} /> PPTX Deck
           </a>
           <button className="icon-button" aria-label="Settings">

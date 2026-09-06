@@ -6,6 +6,8 @@ export interface Message {
   content: string;
 }
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+
 export type DiagramManifest = Record<string, unknown>;
 
 export function useCopilot() {
@@ -36,7 +38,7 @@ export function useCopilot() {
     formData.append("file", selectedFile);
 
     try {
-      const res = await fetch("http://localhost:8000/api/upload-sow", {
+      const res = await fetch("${BACKEND_URL}/api/upload-sow", {
         method: "POST",
         body: formData
       });
@@ -64,7 +66,7 @@ export function useCopilot() {
     setIsSending(true);
 
     try {
-      const res = await fetch("http://localhost:8000/api/chat", {
+      const res = await fetch("${BACKEND_URL}/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMsg, session_id: "default" })

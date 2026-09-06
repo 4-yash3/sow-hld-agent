@@ -1,5 +1,7 @@
 // lib/diagram_utils.ts
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+
 export function getDiagramSrc(manifest: Record<string, Record<string, unknown>>, key: string): string | null {
   const item = manifest[key];
   if (!item) return null;
@@ -13,7 +15,7 @@ export function getDiagramSrc(manifest: Record<string, Record<string, unknown>>,
   const pathStr = typeof item.image_path === "string" ? item.image_path : typeof item.path === "string" ? item.path : "";
   if (pathStr) {
     const filename = pathStr.split(/[/\\]/).pop();
-    return `http://localhost:8000/api/diagram-image/${filename}`;
+    return `${BACKEND_URL}/api/diagram-image/${filename}`;
   }
 
   return null;
